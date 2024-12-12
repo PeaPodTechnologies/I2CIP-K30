@@ -17,12 +17,12 @@ void K30::loadID(void) {
   K30::_id[idlen] = '\0';
   K30::_id_set = true;
 
-  #ifdef WIIPOD_DEBUG_SERIAL
+  #ifdef I2CIP_DEBUG_SERIAL
     DEBUG_DELAY();
-    WIIPOD_DEBUG_SERIAL.print(F("K30 ID Loaded: '"));
-    WIIPOD_DEBUG_SERIAL.print(K30::_id);
-    WIIPOD_DEBUG_SERIAL.print(F("' @0x"));
-    WIIPOD_DEBUG_SERIAL.println((uintptr_t)(&K30::_id[0]), HEX);
+    I2CIP_DEBUG_SERIAL.print(F("K30 ID Loaded: '"));
+    I2CIP_DEBUG_SERIAL.print(K30::_id);
+    I2CIP_DEBUG_SERIAL.print(F("' @0x"));
+    I2CIP_DEBUG_SERIAL.println((uintptr_t)(&K30::_id[0]), HEX);
     DEBUG_DELAY();
   #endif
 }
@@ -75,6 +75,7 @@ i2cip_errorlevel_t K30::get(uint16_t& dest, void* const& args) {
   delayMicroseconds(300);
   digitalWrite(SDA, HIGH);
   delayMicroseconds(1000);
+  I2CIP_FQA_TO_WIRE(this->fqa)->begin();
 
   // Instruct to take a reading
   i2cip_errorlevel_t errlev = write(tx, len, false); // NO BUS SETTING
