@@ -1,50 +1,11 @@
-#include <k30.h>
-
-bool K30::_id_set = false;
-char K30::_id[I2CIP_ID_SIZE];
+#include <K30.h>
 
 using namespace I2CIP;
 
-void K30::loadID(void) {
-  uint8_t idlen = strlen_P(wiipod_k30_id_progmem);
+I2CIP_DEVICE_INIT_STATIC_ID(K30)
+// I2CIP_DEVICES_INIT_PROGMEM_ID(K30)
 
-  // Read in PROGMEM
-  for (uint8_t k = 0; k < idlen; k++) {
-    char c = pgm_read_byte_near(wiipod_k30_id_progmem + k);
-    K30::_id[k] = c;
-  }
-
-  K30::_id[idlen] = '\0';
-  K30::_id_set = true;
-
-  #ifdef I2CIP_DEBUG_SERIAL
-    DEBUG_DELAY();
-    I2CIP_DEBUG_SERIAL.print(F("K30 ID Loaded: '"));
-    I2CIP_DEBUG_SERIAL.print(K30::_id);
-    I2CIP_DEBUG_SERIAL.print(F("' @0x"));
-    I2CIP_DEBUG_SERIAL.println((uintptr_t)(&K30::_id[0]), HEX);
-    DEBUG_DELAY();
-  #endif
-}
-
-// Handles ID pointer assignment too
-// NEVER returns nullptr, unless out of memory
-Device* K30::k30Factory(const i2cip_fqa_t& fqa, const i2cip_id_t& id) {
-  if(!K30::_id_set || id == nullptr) {
-    loadID();
-
-    (Device*)(new K30(fqa, id == nullptr ? _id : id));
-  }
-
-  return (Device*)(new K30(fqa, id));
-}
-
-Device* K30::k30Factory(const i2cip_fqa_t& fqa) { return k30Factory(fqa, K30::getStaticIDBuffer()); }
-
-K30::K30(const i2cip_fqa_t& fqa, const i2cip_id_t& id) : Device(fqa, id), InputInterface<uint16_t, void*>((Device*)this) { }
-K30::K30(const i2cip_fqa_t& fqa) : K30(fqa, K30::_id) { }
-
-// K30::K30(const uint8_t& wire, const uint8_t& module, const uint8_t& addr) : K30(I2CIP_FQA_CREATE(wire, module, I2CIP_MUX_BUS_DEFAULT, addr)) { }
+K30::K30(i2cip_fqa_t fqa, const i2cip_id_t& id) : I2CIP::Device(fqa, id), I2CIP::InputInterface<uint16_t, void*>((I2CIP::Device*)this) { }
 
 i2cip_errorlevel_t K30::get(uint16_t& dest, void* const& args) {
   // 0. Check args
@@ -138,15 +99,4 @@ i2cip_errorlevel_t K30::get(uint16_t& dest, void* const& args) {
   }
 
   return errlev;
-}
-
-// G - Getter type: char* (null-terminated; writable heap)
-void K30::clearCache(void) {
-  this->setCache(0);
-
-  #ifdef I2CIP_DEBUG_SERIAL
-    DEBUG_DELAY();
-    I2CIP_DEBUG_SERIAL.print(F("K30 Cache Cleared (Zeroed)\n"));
-    DEBUG_DELAY();
-  #endif
 }
