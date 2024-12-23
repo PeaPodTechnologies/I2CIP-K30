@@ -2,8 +2,8 @@
 
 using namespace I2CIP;
 
-I2CIP_DEVICE_INIT_STATIC_ID(K30)
-// I2CIP_DEVICES_INIT_PROGMEM_ID(K30)
+I2CIP_DEVICE_INIT_STATIC_ID(K30);
+I2CIP_INPUT_INIT_RESET(K30, uint16_t, 0, void*, nullptr);
 
 K30::K30(i2cip_fqa_t fqa, const i2cip_id_t& id) : I2CIP::Device(fqa, id), I2CIP::InputInterface<uint16_t, void*>((I2CIP::Device*)this) { }
 
@@ -94,7 +94,6 @@ i2cip_errorlevel_t K30::get(uint16_t& dest, void* const& args) {
       I2CIP_DEBUG_SERIAL.println(rx[3], HEX);
       DEBUG_DELAY();
     #endif
-    clearCache();
     errlev = I2CIP_ERR_SOFT;
   }
 

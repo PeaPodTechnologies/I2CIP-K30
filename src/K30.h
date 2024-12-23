@@ -22,6 +22,7 @@ class K30 : public I2CIP::Device, public I2CIP::InputInterface<uint16_t, void*>
   #endif
   {
   I2CIP_DEVICE_CLASS_BUNDLE(K30);
+  I2CIP_INPUT_USE_RESET(uint16_t, void*, void* const);
 
   I2CIP_INPUT_USE_TOSTRING(uint16_t, "%u");
   I2CIP_INPUT_ADD_PRINTCACHE(uint16_t, "%u ppm CO2");
@@ -32,8 +33,6 @@ class K30 : public I2CIP::Device, public I2CIP::InputInterface<uint16_t, void*>
   
   private:
       bool initialized = false;
-
-      void* const isnull = nullptr;
 
       #ifdef MAIN_CLASS_NAME
       friend class MAIN_CLASS_NAME;
@@ -49,9 +48,6 @@ class K30 : public I2CIP::Device, public I2CIP::InputInterface<uint16_t, void*>
        * @param args Number of bytes to read
        **/
       i2cip_errorlevel_t get(uint16_t& dest, void* const& args = nullptr) override;
-
-      void clearCache(void) override { setCache(0); };
-      void* const& getDefaultA(void) const override { return this->isnull; };
 };
 
 #endif
